@@ -6,18 +6,24 @@ const User = require("../models/userModel");
 const router = express.Router();
 
 //create
-router.post("/post", async (req, res) => {
-  const { name, email, age } = req.body;
+router.post("/add", async (req, res) => {
+  console.log(req.body);
+  const { name, email, mobile } = req.body;
+  if (!name || !email || !mobile) {
+    return res
+      .status(400)
+      .json({ error: "All fields (name, email, age) are required" });
+  }
   try {
-    const userAdded = await User.create({
-      name: name,
-      email: email,
-      age: age,
-    });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "Email address already in use" });
+    }
+    const userAdded = await User.create({ name, email, mobile });
     res.status(201).json(userAdded);
   } catch (error) {
-    console.log(error);
-    res.send(400).json({ error: error.message });
+    console.error("Error during user creation:", error);
+    res.status(500).json({ error: "Server error, please try again later" });
   }
 });
 
@@ -25,10 +31,10 @@ router.post("/post", async (req, res) => {
 router.get("/get", async (req, res) => {
   try {
     const showAll = await User.find();
-    res.status(200).json(showAll);
+    res.status(201).json(showAll);
   } catch (error) {
-    console.log(error);
-    res.send(500).json({ error: error.message });
+    console.error("Error during get collection", error);
+    res.status(500).json({ error: "could not show" });
   }
 });
 
@@ -60,7 +66,7 @@ router.delete("/delete/:id", async (req, res) => {
 //put/patch operation
 router.patch("/update/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, email, age } = req.body;
+  const { name, email, mobile } = req.body;
   try {
     const updateUser = await User.findByIdAndUpdate(id, req.body, {
       new: true,
