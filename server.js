@@ -32,3 +32,8 @@ mongoose
   });
 
 app.use(userRoute);
+
+// Simple message endpoint
+app.get("/", (Request, Response) => {
+  res.status(200).send("Welcome to my simple Node.js app!");
+});
