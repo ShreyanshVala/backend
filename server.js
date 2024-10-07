@@ -15,7 +15,8 @@ app.use(
   })
 );
 
-const userRoute = require("./routes/userRoute");
+const postRoute = require("./routes/postRoute");
+const usersRoute = require("./routes/usersRoute");
 
 app.use(express.json());
 mongoose
@@ -31,7 +32,8 @@ mongoose
     console.log("error", error);
   });
 
-app.use(userRoute);
+app.use("/api", usersRoute);
+app.use("/post", postRoute);
 
 // Simple message endpoint
 app.get("/", (req, res) => {
